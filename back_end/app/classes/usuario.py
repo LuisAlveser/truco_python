@@ -7,12 +7,22 @@ class Usuario:
         self._nome = nome
         self._email = email
         self._senha = senha
+        self._maoVez = True
         self._pontuacao = 0
 
     @property
     def pontuacao(self):
         return self._pontuacao
 
+    @property
+    def maoVez(self):
+        return self._maoVez
+
+    @maoVez.setter
+    def alterna_mao_Vez(self, estado: bool):
+        self._maoVez = estado
+
+    @pontuacao.setter
     def incrementa_pontuacao(self, ponto):
         self._pontuacao += ponto
 

@@ -1,6 +1,7 @@
 from carta import Naipe, Carta
 from usuario import Usuario
-
+from bot import Bot
+from regras import Regras
 import random
 
 
@@ -45,15 +46,33 @@ if __name__ == "__main__":
     print(meu_baralho)
 
     print("\n--- Testando a distribuição de 6 cartas ---")
+
     cartas_na_mesa = meu_baralho.distribuir_cartas()
     cartas_jogador = []
-    for i in range(3):
-        cartas_jogador.append(cartas_na_mesa[i])
+    cartas_bot = []
+    cartas_jogador = cartas_na_mesa[0:3]
+    cartas_bot = cartas_na_mesa[3:6]
 
-    print(f"Cartas dos jogadores,{cartas_na_mesa}")
     usuario = Usuario("luis", "erci@gmiaj", "ddasfsdfd")
-    usuario.recebeCartas(cartas_jogador)
-    usuario.jogarcarta(cartas_jogador[0].id_carta)
+    bot = Bot("Bot")
 
-    print(
-        f"\nTotal de cartas restantes no baralho: {len(meu_baralho._cartas)}")
+    bot.recebeCartas(cartas_bot)
+    usuario.recebeCartas(cartas_jogador)
+
+# carta_usuario = usuario.jogarcarta(cartas_jogador[0].id_carta)
+# carta_bot = bot.jogarcarta(cartas_bot[0].id_carta)
+
+regras = Regras(usuario, bot)
+
+
+# result = regras.verifica_carta_mais_forte_da_rodada(carta_usuario, carta_bot)
+# print(result)
+
+pontuacao_jogador = regras.verifica_valor_envido(cartas_jogador)
+
+pontuacao_bot = regras.verifica_valor_envido(cartas_bot)
+
+ganhador = regras.comparacao_pontos_envido(pontuacao_jogador, pontuacao_bot)
+
+print(
+    f"Pontuação Jogador:{pontuacao_jogador},Bot pontuação :{pontuacao_bot}, Ganhador:{ganhador}")
