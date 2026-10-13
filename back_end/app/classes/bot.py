@@ -16,8 +16,12 @@ class Bot:
     def maoVez(self):
         return self._maoVez
 
+    @property
+    def nome(self):
+        return self._nome
+
     @maoVez.setter
-    def alterna_mao_Vez(self, estado: bool):
+    def maoVez(self, estado: bool):
         self._maoVez = estado
 
     @pontuacao.setter

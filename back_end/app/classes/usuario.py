@@ -19,8 +19,12 @@ class Usuario:
         return self._maoVez
 
     @maoVez.setter
-    def alterna_mao_Vez(self, estado: bool):
+    def maoVez(self, estado: bool):
         self._maoVez = estado
+
+    @property
+    def nome(self):
+        return self._nome
 
     @pontuacao.setter
     def incrementa_pontuacao(self, ponto):

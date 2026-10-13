@@ -69,6 +69,10 @@ class Regras:
         else:
             return False
 
+    def trocaMaoJogadores(self):
+        self._bot._maoVez = not self._bot._maoVez
+        self._jogador1._maoVez = not self._bot._maoVez
+
     def obter_peso(self, carta):
 
         return self._hierarquia.get((carta.valor, carta.naipe), 0)

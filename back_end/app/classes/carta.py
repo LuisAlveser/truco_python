@@ -31,4 +31,4 @@ class Carta:
         return self._valor
 
     def __repr__(self):
-        return f"Carta({self._valor} de {self._naipe.name})"
+        return f"Carta(id:{self.id_carta},{self._valor} de {self._naipe.name})"
