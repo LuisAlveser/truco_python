@@ -1,4 +1,4 @@
-from carta import Naipe, Carta
+from .carta import Naipe, Carta
 
 
 class Bot:

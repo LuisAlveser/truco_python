@@ -1,6 +1,6 @@
-from carta import Naipe, Carta
-from usuario import Usuario
-from bot import Bot
+from .carta import Naipe, Carta
+from .usuario import Usuario
+from .bot import Bot
 
 
 class Regras:

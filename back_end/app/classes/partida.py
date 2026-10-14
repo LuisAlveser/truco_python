@@ -1,13 +1,15 @@
 from enum import Enum
-from usuario import Usuario
-from bot import Bot
-from regras import Regras
-from baralho import Baralho
+from .usuario import Usuario
+from .bot import Bot
+from .regras import Regras
+from .baralho import Baralho
 
 
 class TrucoOpcao(Enum):
     QUERO = 0
     CORRER = 1
+    RETRUCO = 2
+    VALE_QUATRO = 3
 
 
 class EnvidoOpcao(Enum):
@@ -27,7 +29,7 @@ class Partida:
         self.regras = Regras(self._jogador, self._bot)
 
         self.baralho = Baralho()
-
+        self.valor_da_mao_atual = 1
         self.envido_ja_cantado = False
         self.envido_permitido = True
         self.PONTUACAO_MAXIMA = 24
@@ -76,18 +78,29 @@ class Partida:
                 if pontos_envido_bot >= 28:
                     self.gerenciar_pedido_envido(self._bot)
 
-    def gerenciar_pedido_truco(self, quem_pediu, valor_atual_mao):
+    def gerenciar_pedido_truco(self, quem_pediu):
         oponente = self._bot if quem_pediu == self._jogador else self._jogador
         print(f"\n📢 {quem_pediu.nome} gritou TRUCO!")
 
         resposta = oponente.decidir_truco()
 
         if resposta == TrucoOpcao.QUERO:
-            print(f"✅ {oponente.nome} aceitou! A mão agora vale 2 tentos.")
-            return 2
+            if self.valor_da_mao_atual == 1:
+                self.valor_da_mao_atual = 2
+                print(f"✅ {oponente.nome} aceitou! A mão agora vale 2 tentos.")
+            elif self.valor_da_mao_atual == 2:
+                self.valor_da_mao_atual = 3
+                print(
+                    f"✅ {oponente.nome} aceitou o Retruco! A mão agora vale 3 tentos.")
+            elif self.valor_da_mao_atual == 3:
+                self.valor_da_mao_atual = 4
+                print(
+                    f"✅ {oponente.nome} aceitou o Vale Quatro! A mão agora vale 4 tentos.")
+            return self.valor_da_mao_atual
+
         elif resposta == TrucoOpcao.CORRER:
             print(f"🏃 {oponente.nome} correu do truco!")
-            quem_pediu._pontuacao += valor_atual_mao
+            quem_pediu._pontuacao += self.valor_da_mao_atual
             return -1
 
     def gerenciar_pedido_envido(self, quem_pediu):
@@ -95,7 +108,6 @@ class Partida:
         oponente = self._bot if quem_pediu == self._jogador else self._jogador
         print(f"\n📢 {quem_pediu.nome} cantou ENVIDO!")
 
-        # Decisão do oponente
         if oponente == self._bot:
             pontos_bot_temp = self.regras.verifica_valor_envido(self._bot._mao)
             resposta = EnvidoOpcao.QUERO if pontos_bot_temp >= 27 else EnvidoOpcao.NAO_QUERO
@@ -108,8 +120,8 @@ class Partida:
 
         if resposta == EnvidoOpcao.QUERO:
             print("✅ Envido aceito!")
-            pontos_j = self.regras.verifica_valor_envido(self._jogador.mao)
-            pontos_b = self.regras.verifica_valor_envido(self._bot.mao)
+            pontos_j = self.regras.verifica_valor_envido(self._jogador._mao)
+            pontos_b = self.regras.verifica_valor_envido(self._bot._mao)
 
             print(
                 f"📊 Pontuação de Envido -> {self._jogador.nome}: {pontos_j} | Bot: {pontos_b}")
@@ -152,8 +164,6 @@ class Partida:
 
             # 2. FASE PRELIMINAR (FLOR / ENVIDO)
             self.fase_preliminar()
-
-            valor_da_mao_atual = 1
 
             # 3. RODADAS DE CARTAS (MELHOR DE 3)
             for self.rodadas in range(3):
@@ -212,13 +222,13 @@ class Partida:
                 # VERIFICA SE ALGUÉM FEZ 2 PONTOS NA MÃO
                 if self.vitorias_jogador == 2:
                     print(
-                        f"\n🎉 {self._jogador.nome} ganhou a mão (+{valor_da_mao_atual} tento)!")
-                    self._jogador._pontuacao += valor_da_mao_atual
+                        f"\n🎉 {self._jogador.nome} ganhou a mão (+{self.valor_da_mao_atual} tento)!")
+                    self._jogador._pontuacao += self.valor_da_mao_atual
                     break
                 elif self.vitorias_bot == 2:
                     print(
-                        f"\n🤖 Bot ganhou a mão (+{valor_da_mao_atual} tento)!")
-                    self._bot._pontuacao += valor_da_mao_atual
+                        f"\n🤖 Bot ganhou a mão (+{self.valor_da_mao_atual} tento)!")
+                    self._bot._pontuacao += self.valor_da_mao_atual
                     break
 
             # 4. FINAL DA MÃO E PREPARAÇÃO DA PRÓXIMA

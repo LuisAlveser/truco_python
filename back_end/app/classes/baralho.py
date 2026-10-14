@@ -1,7 +1,7 @@
-from carta import Naipe, Carta
-from usuario import Usuario
-from bot import Bot
-from regras import Regras
+from .carta import Naipe, Carta
+from .usuario import Usuario
+from .bot import Bot
+from .regras import Regras
 import random
 
 

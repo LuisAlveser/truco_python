@@ -1,12 +1,11 @@
-from carta import Naipe, Carta
+from .carta import Naipe, Carta
 
 
 class Usuario:
-    def __init__(self, nome, email, senha):
+    def __init__(self, nome):
         self._mao = []
         self._nome = nome
-        self._email = email
-        self._senha = senha
+
         self._maoVez = True
         self._pontuacao = 0
 
