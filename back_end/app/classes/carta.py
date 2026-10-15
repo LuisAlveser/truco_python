@@ -32,3 +32,11 @@ class Carta:
 
     def __repr__(self):
         return f"Carta(id:{self.id_carta},{self._valor} de {self._naipe.name})"
+
+    def to_dict(self):
+        return {
+            "id": self.id_carta,
+            "valor": self._valor,
+            "neipe": self._naipe.name,
+            "nome": self.__repr__()
+        }

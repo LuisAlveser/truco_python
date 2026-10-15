@@ -8,7 +8,7 @@ from .partida import TrucoOpcao, EnvidoOpcao
 
 def rodar_jogo():
     # 1. Cria instâncias dos jogadores com estados iniciais básicos
-    usuario = Usuario(nome="Luis")
+    usuario = Usuario(nome="Jogador")
     bot = Bot(nome="Bot Gaudério")
 
     usuario.maoVez = True

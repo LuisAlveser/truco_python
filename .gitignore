@@ -1,0 +1,6 @@
+# Ignorar a pasta inteira do front-end nesta branch
+/front_end
+
+# Ignorar o cache do Python
+**/__pycache__/
+*.pyc

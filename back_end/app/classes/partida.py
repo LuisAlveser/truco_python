@@ -32,6 +32,8 @@ class Partida:
         self.valor_da_mao_atual = 1
         self.envido_ja_cantado = False
         self.envido_permitido = True
+        self.flor_ja_cantada = False
+        self.mao_inicial = self._jogador.maoVez
         self.PONTUACAO_MAXIMA = 24
         self.partida_encerrada = False
 
@@ -39,6 +41,29 @@ class Partida:
         if not hasattr(self._jogador, "_maoVez") or not hasattr(self._bot, "_maoVez"):
             self._jogador._maoVez = True
             self._bot._maoVez = False
+
+    def vencedor_mao(self):
+        if len(self.historico_rodadas) < 2:
+            return None
+
+        primeira, segunda = self.historico_rodadas[:2]
+        if primeira == segunda and primeira != 2:
+            return primeira
+        if primeira == 2 and segunda != 2:
+            return segunda
+        if primeira != 2 and segunda == 2:
+            return primeira
+        if len(self.historico_rodadas) < 3:
+            return None
+
+        terceira = self.historico_rodadas[2]
+        if terceira != 2:
+            return terceira
+        if primeira != 2:
+            return primeira
+        if segunda != 2:
+            return segunda
+        return 0 if self.mao_inicial else 1
 
     def fase_preliminar(self):
         """Gerencia os cantos de Flor e Envido antes das jogadas das cartas"""
@@ -80,62 +105,70 @@ class Partida:
 
     def gerenciar_pedido_truco(self, quem_pediu):
         oponente = self._bot if quem_pediu == self._jogador else self._jogador
-        print(f"\n📢 {quem_pediu.nome} gritou TRUCO!")
+        print(f"\n{quem_pediu.nome} gritou TRUCO!")
 
-        resposta = oponente.decidir_truco()
+        if oponente == self._bot:
+            resposta = TrucoOpcao.QUERO
+        else:
+            escolha = input(
+                f"{oponente.nome}, aceita o truco? (q = Quero / c = Correr): "
+            ).strip().lower()
+            resposta = (
+                TrucoOpcao.QUERO if escolha == "q" else TrucoOpcao.CORRER
+            )
 
         if resposta == TrucoOpcao.QUERO:
             if self.valor_da_mao_atual == 1:
                 self.valor_da_mao_atual = 2
-                print(f"✅ {oponente.nome} aceitou! A mão agora vale 2 tentos.")
+                print(f"{oponente.nome} aceitou! A mão agora vale 2 tentos.")
             elif self.valor_da_mao_atual == 2:
                 self.valor_da_mao_atual = 3
                 print(
-                    f"✅ {oponente.nome} aceitou o Retruco! A mão agora vale 3 tentos.")
+                    f"{oponente.nome} aceitou o Retruco! A mão agora vale 3 tentos.")
             elif self.valor_da_mao_atual == 3:
                 self.valor_da_mao_atual = 4
                 print(
-                    f"✅ {oponente.nome} aceitou o Vale Quatro! A mão agora vale 4 tentos.")
+                    f"{oponente.nome} aceitou o Vale Quatro! A mão agora vale 4 tentos.")
             return self.valor_da_mao_atual
 
         elif resposta == TrucoOpcao.CORRER:
-            print(f"🏃 {oponente.nome} correu do truco!")
+            print(f"{oponente.nome} correu do truco!")
             quem_pediu._pontuacao += self.valor_da_mao_atual
             return -1
 
     def gerenciar_pedido_envido(self, quem_pediu):
         self.envido_ja_cantado = True
         oponente = self._bot if quem_pediu == self._jogador else self._jogador
-        print(f"\n📢 {quem_pediu.nome} cantou ENVIDO!")
+        print(f"\n{quem_pediu.nome} cantou ENVIDO!")
 
         if oponente == self._bot:
             pontos_bot_temp = self.regras.verifica_valor_envido(self._bot._mao)
             resposta = EnvidoOpcao.QUERO if pontos_bot_temp >= 27 else EnvidoOpcao.NAO_QUERO
             print(
-                f"🤖 Bot respondeu: {'QUERO' if resposta == EnvidoOpcao.QUERO else 'NÃO QUERO'}")
+                f"Bot respondeu: {'QUERO' if resposta == EnvidoOpcao.QUERO else 'NAO QUERO'}")
         else:
             resp_user = input(
                 f"{self._jogador.nome}, aceita o Envido? (q = Quero / n = Não Quero): ").strip().lower()
             resposta = EnvidoOpcao.QUERO if resp_user == 'q' else EnvidoOpcao.NAO_QUERO
 
         if resposta == EnvidoOpcao.QUERO:
-            print("✅ Envido aceito!")
+            print("Envido aceito!")
             pontos_j = self.regras.verifica_valor_envido(self._jogador._mao)
             pontos_b = self.regras.verifica_valor_envido(self._bot._mao)
 
             print(
-                f"📊 Pontuação de Envido -> {self._jogador.nome}: {pontos_j} | Bot: {pontos_b}")
+                f"Pontuacao de Envido -> {self._jogador.nome}: {pontos_j} | Bot: {pontos_b}")
 
             vencedor = self.regras.comparacao_pontos_envido(pontos_j, pontos_b)
 
             if vencedor == 0:
-                print(f"🏆 {self._jogador.nome} ganhou o Envido!")
+                print(f"{self._jogador.nome} ganhou o Envido!")
                 self._jogador._pontuacao += 2
             else:
-                print("🏆 Bot ganhou o Envido!")
+                print("Bot ganhou o Envido!")
                 self._bot._pontuacao += 2
         elif resposta == EnvidoOpcao.NAO_QUERO:
-            print(f"❌ {oponente.nome} correu do Envido.")
+            print(f"{oponente.nome} correu do Envido.")
             quem_pediu._pontuacao += 1
 
     def inicio_partida(self):
@@ -152,6 +185,8 @@ class Partida:
             self.vitorias_bot = 0
             self.envido_permitido = True
             self.envido_ja_cantado = False
+            self.flor_ja_cantada = False
+            self.mao_inicial = self._jogador.maoVez
 
             self._jogador.recebeCartas(cartas_jogador)
             self._bot.recebeCartas(cartas_bot)
@@ -211,21 +246,23 @@ class Partida:
                     self._jogador._maoVez = True
                     self._bot._maoVez = False
                     self.vitorias_jogador += 1
-                else:
+                elif resultado == 1:
                     print("👉 Vencedor da rodada: Bot")
                     self._jogador._maoVez = False
                     self._bot._maoVez = True
                     self.vitorias_bot += 1
+                else:
+                    print("👉 A rodada empatou.")
 
                 self.envido_permitido = False
 
-                # VERIFICA SE ALGUÉM FEZ 2 PONTOS NA MÃO
-                if self.vitorias_jogador == 2:
+                vencedor_mao = self.vencedor_mao()
+                if vencedor_mao == 0:
                     print(
                         f"\n🎉 {self._jogador.nome} ganhou a mão (+{self.valor_da_mao_atual} tento)!")
                     self._jogador._pontuacao += self.valor_da_mao_atual
                     break
-                elif self.vitorias_bot == 2:
+                elif vencedor_mao == 1:
                     print(
                         f"\n🤖 Bot ganhou a mão (+{self.valor_da_mao_atual} tento)!")
                     self._bot._pontuacao += self.valor_da_mao_atual

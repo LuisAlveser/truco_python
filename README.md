@@ -15,9 +15,7 @@ Um jogo completo de **Truco Gaúcho (Espanhol)** jogado contra um **Bot (IA em P
 ### **Backend**
 - **Python 3.11+**
 - **FastAPI** (WebSockets em tempo real e API RESTful)
-- **Pydantic** (Validação de tipos e esquemas de dados)
-- **Pytest** (Suíte de testes unitários para a engine de regras)
-- **SQLAlchemy / SQLModel** + **PostgreSQL** (Persistência de estatísticas)
+
 
 ### **DevOps & Deploy**
 - **Docker & Docker Compose** (Containerização do ambiente)
@@ -60,8 +58,8 @@ O Bot do jogo é construído em Python puro e integrado diretamente ao fluxo da 
 ```text
 ┌─────────────────────────────────────────────────────────┐
 │                    Next.js (Frontend)                   │
-│  - Tabuleiro interativo e animações com Framer Motion   │
-│  - Gerenciamento de estado de voz, placar e turnos      │
+│  - Tabuleiro interativo    │
+│       
 └───────────────────────────┬─────────────────────────────┘
                             │
                             │ WebSockets (Eventos JSON)
@@ -72,9 +70,5 @@ O Bot do jogo é construído em Python puro e integrado diretamente ao fluxo da 
 │  ├── Módulo do Bot (Tomada de Decisão & Heurística)     │
 │  └── Connection Manager (Comunicação em Tempo Real)     │
 └───────────────────────────┬─────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────┐
-│                 PostgreSQL (Banco de Dados)             │
-│  - Usuários, estatísticas de vitórias e histórico       │
-└─────────────────────────────────────────────────────────┘
+
+![Demonstração do Jogo](./front_end/public/print_jogo_python.PNG)
