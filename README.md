@@ -60,7 +60,7 @@ O Bot do jogo é construído em Python puro e integrado diretamente ao fluxo da 
 ```text
 ┌─────────────────────────────────────────────────────────┐
 │                    Next.js (Frontend)                   │
-│  - Tabuleiro interativo e animações com Framer Motion   │
+│  - Tabuleiro interativo    │
 │  - Gerenciamento de estado de voz, placar e turnos      │
 └───────────────────────────┬─────────────────────────────┘
                             │
@@ -72,9 +72,4 @@ O Bot do jogo é construído em Python puro e integrado diretamente ao fluxo da 
 │  ├── Módulo do Bot (Tomada de Decisão & Heurística)     │
 │  └── Connection Manager (Comunicação em Tempo Real)     │
 └───────────────────────────┬─────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────┐
-│                 PostgreSQL (Banco de Dados)             │
-│  - Usuários, estatísticas de vitórias e histórico       │
-└─────────────────────────────────────────────────────────┘
+           
