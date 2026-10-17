@@ -2,6 +2,10 @@
 
 Um jogo completo de **Truco Gaúcho (Espanhol)** jogado contra um **Bot (IA em Python)** em tempo real via **WebSockets**, desenvolvido com uma arquitetura moderna e escalável utilizando **FastAPI** no backend e **Next.js** no frontend.
 
+<p align="center">
+  <img src="print_jogo_python.PNG" alt="Demonstração do Jogo" width="700">
+</p>
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
@@ -48,7 +52,7 @@ O jogo segue as regras tradicionais do **Truco Gaúcho/Espanhol**:
 
 O Bot do jogo é construído em Python puro e integrado diretamente ao fluxo da partida:
 
-- **Análise de Mão:** Avalia a força das cartas para tomar decisões de ataque ou defesa.
+- **Análise de Mão:** Avalia a força das cartas para tomar decisões de ataque ou defense.
 - **Cálculo de Envido:** Toma decisões estatísticas para pedir ou aceitar Envido com base em sua pontuação atual e blefes aleatórios.
 - **Respostas de Flor:** Canta e responde automaticamente a combinações de 3 cartas do mesmo naipe.
 - **Simulação de Humano:** Delay de resposta configurável via WebSocket para simular o tempo de pensamento.
@@ -60,7 +64,7 @@ O Bot do jogo é construído em Python puro e integrado diretamente ao fluxo da 
 ```text
 ┌─────────────────────────────────────────────────────────┐
 │                    Next.js (Frontend)                   │
-│  - Tabuleiro interativo e animações com Framer Motion   │
+│  - Tabuleiro interativo                                 │
 │  - Gerenciamento de estado de voz, placar e turnos      │
 └───────────────────────────┬─────────────────────────────┘
                             │
@@ -72,9 +76,6 @@ O Bot do jogo é construído em Python puro e integrado diretamente ao fluxo da 
 │  ├── Módulo do Bot (Tomada de Decisão & Heurística)     │
 │  └── Connection Manager (Comunicação em Tempo Real)     │
 └───────────────────────────┬─────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────┐
-│                 PostgreSQL (Banco de Dados)             │
-│  - Usuários, estatísticas de vitórias e histórico       │
-└─────────────────────────────────────────────────────────┘
+```
+
+---
