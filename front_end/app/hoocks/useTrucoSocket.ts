@@ -17,6 +17,8 @@ export function useTrucoSocket(roomId: string) {
     const [cartasBot, setCartasBot] = useState(0);
     const [placar, setPlacar] = useState<Placar>({ jogador: 0, bot: 0 });
     const [partidaEncerrada, setPartidaEncerrada] = useState(false);
+    const [jogadaPendente, setJogadaPendente] = useState(false);
+    const [florCantada, setFlorCantada] = useState(false);
     const [turnoJogador, setTurnoJogador] = useState<boolean>(false);
     const [valorMao, setValorMao] = useState<number>(1);
     const [cartaMesaUsuario, setCartaMesaUsuario] = useState<Carta | null>(null);
@@ -25,12 +27,14 @@ export function useTrucoSocket(roomId: string) {
 
     const socketRef = useRef<WebSocket | null>(null);
 
-    // Declaração antecipada para o onopen/onmessage
-    const enviarAcao = useCallback((dados: object) => {
+
+    const enviarAcao = useCallback((dados: object): boolean => {
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify(dados));
+            return true;
         } else {
             console.error("WebSocket não está conectado.");
+            return false;
         }
     }, []);
 
@@ -54,6 +58,8 @@ export function useTrucoSocket(roomId: string) {
             switch (data.evento) {
                 case "INICIO_MAO":
                     setPartidaEncerrada(false);
+                    setJogadaPendente(false);
+                    setFlorCantada(false);
                     if (data.cartas_jogador) {
                         setCartasJogador(data.cartas_jogador);
                     }
@@ -67,9 +73,12 @@ export function useTrucoSocket(roomId: string) {
                     break;
 
                 case "FIM_RODADA":
+                    setJogadaPendente(Boolean(data.mao_encerrada));
                     setCartaMesaUsuario(data.carta_usuario);
                     setCartaMesaBot(data.carta_bot);
-                    setCartasBot((cartas) => Math.max(0, cartas - 1));
+                    if (data.cartas_bot !== undefined) {
+                        setCartasBot(data.cartas_bot);
+                    }
                     if (data.cartas_restantes_jogador) {
                         setCartasJogador(data.cartas_restantes_jogador);
                     }
@@ -95,6 +104,7 @@ export function useTrucoSocket(roomId: string) {
                     break;
 
                 case "RESULTADO_CANTAR_FLOR":
+                    setFlorCantada(true);
                     if (data.placar) setPlacar(data.placar);
                     break;
 
@@ -105,6 +115,7 @@ export function useTrucoSocket(roomId: string) {
                     break;
 
                 case "ERRO":
+                    setJogadaPendente(false);
                     alert(`Erro: ${data.mensagem}`);
                     break;
 
@@ -128,7 +139,9 @@ export function useTrucoSocket(roomId: string) {
     }, [roomId, cantarFlor]);
 
     const jogarCarta = (cartaId: number) => {
-        enviarAcao({ acao: "JOGAR_CARTA", carta_id: cartaId });
+        if (enviarAcao({ acao: "JOGAR_CARTA", carta_id: cartaId })) {
+            setJogadaPendente(true);
+        }
     };
 
     const cantarTruco = () => {
@@ -142,6 +155,8 @@ export function useTrucoSocket(roomId: string) {
     return {
         statusConexao,
         partidaEncerrada,
+        jogadaPendente,
+        florCantada,
         cartasJogador,
         placar,
         turnoJogador,

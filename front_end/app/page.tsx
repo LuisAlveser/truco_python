@@ -4,11 +4,26 @@ import { Carta, useTrucoSocket } from "@/app/hoocks/useTrucoSocket";
 import Image from "next/image";
 import TelaReiniciar from "./componentes/Tela_Reiniciar_Partida";
 import Regras from "./componentes/Regras";
+
+const naipes = {
+  OROS: "oros",
+  BASTOS: "bastos",
+  ESPADAS: "espadas",
+  COPAS: "copas",
+} as const;
+
+function caminhoImagemCarta(carta: Carta) {
+  const naipe = naipes[carta.neipe as keyof typeof naipes];
+  return naipe ? `/cartas/${naipe}/${naipe}_${carta.valor}_.png` : "/cartas/costas_da_carta.png";
+}
+
 export default function MesaTruco() {
 
   const {
     statusConexao,
     partidaEncerrada,
+    jogadaPendente,
+    florCantada,
     cartasJogador,
     placar,
     valorMao,
@@ -19,10 +34,6 @@ export default function MesaTruco() {
     cantarTruco,
     cantarEnvido,
     cantarFlor,
-    setCartasJogador,
-    setCartaMesaUsuario,
-
-
   } = useTrucoSocket("skjksd");
 
   const [flor, setflor] = useState<boolean>(false)
@@ -53,10 +64,6 @@ export default function MesaTruco() {
 
   const jogarCarta_id = (carta: Carta) => {
     jogarCarta(carta.id)
-    setCartasJogador(prev => prev.filter(c => c.id !== carta.id));
-    setCartaMesaUsuario(carta)
-
-
   }
   const regras = () => {
     setjanela_regras(!janela_regras)
@@ -111,15 +118,7 @@ export default function MesaTruco() {
               <Image
 
                 key={cartaMesaUsuario.id}
-
-                src={
-                  cartaMesaUsuario.neipe === "OROS" ? `/cartas/oros/oros_${cartaMesaUsuario.valor}_.png`
-                    : cartaMesaUsuario.neipe === "BASTOS"
-                      ? `/cartas/bastos/bastos_${cartaMesaUsuario.valor}_.png`
-                      : cartaMesaUsuario.neipe === "ESPADAS"
-                        ? `/cartas/espadas/espadas_${cartaMesaUsuario.valor}_.png`
-                        : cartaMesaUsuario.neipe === "COPAS" ? `/cartas/copas/copas_${cartaMesaUsuario.valor}_.png` : ""
-                }
+                src={caminhoImagemCarta(cartaMesaUsuario)}
                 alt="Descrição da imagem"
                 width={80}
                 height={100}
@@ -131,15 +130,7 @@ export default function MesaTruco() {
               <Image
 
                 key={cartaMesaBot.id}
-
-                src={
-                  cartaMesaBot.neipe === "OROS" ? `/cartas/oros/oros_${cartaMesaBot.valor}_.png`
-                    : cartaMesaBot.neipe === "BASTOS"
-                      ? `/cartas/bastos/bastos_${cartaMesaBot.valor}_.png`
-                      : cartaMesaBot.neipe === "ESPADAS"
-                        ? `/cartas/espadas/espadas_${cartaMesaBot.valor}_.png`
-                        : cartaMesaBot.neipe === "COPAS" ? `/cartas/copas/copas_${cartaMesaBot.valor}_.png` : ""
-                }
+                src={caminhoImagemCarta(cartaMesaBot)}
                 alt="Descrição da imagem"
                 width={80}
                 height={100}
@@ -160,7 +151,7 @@ export default function MesaTruco() {
             Cantar Envido 📊
           </button>
 
-          {flor ?
+          {flor && !florCantada ?
             <button disabled={partidaEncerrada} onClick={() => cantarFlor()} className=" cursor-pointer bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-1.5 px-4 rounded-lg shadow transition disabled:opacity-50">
               Cantar Flor 🌸
             </button>
@@ -177,15 +168,10 @@ export default function MesaTruco() {
             <Image
               className="transition-transform duration-300 hover:-translate-y-2"
               key={carta.id}
-              onClick={() => { if (!partidaEncerrada) jogarCarta_id(carta) }}
-              src={
-                carta.neipe === "OROS" ? `/cartas/oros/oros_${carta.valor}_.png`
-                  : carta.neipe === "BASTOS"
-                    ? `/cartas/bastos/bastos_${carta.valor}_.png`
-                    : carta.neipe === "ESPADAS"
-                      ? `/cartas/espadas/espadas_${carta.valor}_.png`
-                      : carta.neipe === "COPAS" ? `/cartas/copas/copas_${carta.valor}_.png` : ""
-              }
+              onClick={() => {
+                if (!partidaEncerrada && !jogadaPendente) jogarCarta_id(carta);
+              }}
+              src={caminhoImagemCarta(carta)}
               alt="Descrição da imagem"
               width={100}
               height={150}

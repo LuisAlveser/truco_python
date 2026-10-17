@@ -45,29 +45,23 @@ class Regras:
 
         v = [0 if c.valor in [10, 11, 12] else c.valor for c in Carta]
 
-    # Caso 1: Carta 0 e Carta 1 têm o mesmo naipe
         if Carta[0].naipe == Carta[1].naipe:
             return resultado + v[0] + v[1]
 
-    # Caso 2: Carta 1 e Carta 2 têm o mesmo naipe
         elif Carta[1].naipe == Carta[2].naipe:
             return resultado + v[1] + v[2]
 
-    # Caso 3: Carta 0 e Carta 2 têm o mesmo naipe (O caso da sua mão atual!)
         elif Carta[0].naipe == Carta[2].naipe:
             return resultado + v[0] + v[2]
 
-    # Caso 4: Nenhuma carta tem o mesmo naipe (Vale a maior carta individual)
         else:
             return max(v[0], v[1], v[2])
 
-    # função que verifica se o usuario tem tres cartas do mesmo naipe
-
     def verifica_flor(self, Carta: list):
-        if Carta[0].naipe == Carta[1].naipe == Carta[2].naipe:
-            return True
-        else:
-            return False
+        return (
+            len(Carta) == 3
+            and Carta[0].naipe == Carta[1].naipe == Carta[2].naipe
+        )
 
     def trocaMaoJogadores(self):
         self._bot._maoVez = not self._bot._maoVez
@@ -82,8 +76,9 @@ class Regras:
         peso_bot = self.obter_peso(bot_carta)
         if peso_jogador > peso_bot:
             return 0
-        else:
+        if peso_jogador < peso_bot:
             return 1
+        return 2
 
     def comparacao_pontos_envido(self, pontos_jogador, pontos_bot):
         if pontos_jogador > pontos_bot:

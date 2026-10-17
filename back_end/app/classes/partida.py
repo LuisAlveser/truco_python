@@ -32,10 +32,10 @@ class Partida:
         self.valor_da_mao_atual = 1
         self.envido_ja_cantado = False
         self.envido_permitido = True
+        self.flor_ja_cantada = False
         self.PONTUACAO_MAXIMA = 24
         self.partida_encerrada = False
 
-        # Garante o estado inicial da mão (Jogador começa como mão se não definido)
         if not hasattr(self._jogador, "_maoVez") or not hasattr(self._bot, "_maoVez"):
             self._jogador._maoVez = True
             self._bot._maoVez = False
@@ -44,7 +44,6 @@ class Partida:
         """Gerencia os cantos de Flor e Envido antes das jogadas das cartas"""
         print("\n--- FASE PRELIMINAR (FLOR E ENVIDO) ---")
 
-        # 1. FLOR (Checagem automática)
         tem_flor_jogador = self.regras.verifica_flor(self._jogador._mao)
         tem_flor_bot = self.regras.verifica_flor(self._bot._mao)
 
@@ -65,14 +64,13 @@ class Partida:
             self.envido_permitido = False
             return
 
-        # 2. ENVIDO (Se ninguém teve Flor)
         if self.envido_permitido and not self.envido_ja_cantado:
             quer_envido = input(
                 f"\n{self._jogador.nome}, deseja cantar ENVIDO? (s/n): ").strip().lower()
             if quer_envido == 's':
                 self.gerenciar_pedido_envido(self._jogador)
             else:
-                # O Bot decide se canta Envido por conta própria
+
                 pontos_envido_bot = self.regras.verifica_valor_envido(
                     self._bot._mao)
                 if pontos_envido_bot >= 28:
@@ -140,7 +138,7 @@ class Partida:
 
     def inicio_partida(self):
         while True:
-            # 1. PREPARAÇÃO DA MÃO
+
             self.baralho = Baralho()
             cartas = self.baralho.distribuir_cartas()
 
@@ -156,25 +154,21 @@ class Partida:
             self._jogador.recebeCartas(cartas_jogador)
             self._bot.recebeCartas(cartas_bot)
 
-            # Placar atualizado na tela
             print(f"\n==================================================")
             print(
                 f"🎮 PLACAR DA PARTIDA: {self._jogador.nome} [{self._jogador._pontuacao}] x [{self._bot._pontuacao}] Bot")
             print(f"==================================================")
 
-            # 2. FASE PRELIMINAR (FLOR / ENVIDO)
             self.fase_preliminar()
 
-            # 3. RODADAS DE CARTAS (MELHOR DE 3)
             for self.rodadas in range(3):
                 print(f"\n======== {self.rodadas + 1}ª RODADA ========")
 
                 carta_usuario = None
                 carta_bot = None
 
-                # ORDEM DE JOGADA DE ACORDO COM A VEZ
                 if self._jogador._maoVez:
-                    # VEZ DO USUÁRIO PRIMEIRO
+
                     print(f"\n👋 Suas cartas, {self._jogador.nome}:")
                     for c in self._jogador._mao:
                         print(f"   [ID: {c.id_carta}] -> {c}")
@@ -183,12 +177,11 @@ class Partida:
                         input("\nDigite o ID da carta que deseja jogar: "))
                     carta_usuario = self._jogador.jogarcarta(id_escolhido)
 
-                    # VEZ DO BOT DEPOIS
                     id_bot = self._bot._mao[0].id_carta
                     carta_bot = self._bot.jogarcarta(id_bot)
                     print(f"🤖 Carta jogada pelo Bot: {carta_bot}")
                 else:
-                    # VEZ DO BOT PRIMEIRO
+
                     id_bot = self._bot._mao[0].id_carta
                     carta_bot = self._bot.jogarcarta(id_bot)
 
@@ -201,7 +194,6 @@ class Partida:
                         input("\nDigite o ID da carta que deseja jogar: "))
                     carta_usuario = self._jogador.jogarcarta(id_escolhido)
 
-                # AVALIAÇÃO DA RODADA
                 resultado = self.regras.verifica_carta_mais_forte_da_rodada(
                     carta_usuario, carta_bot)
                 self.historico_rodadas.append(resultado)
@@ -219,7 +211,6 @@ class Partida:
 
                 self.envido_permitido = False
 
-                # VERIFICA SE ALGUÉM FEZ 2 PONTOS NA MÃO
                 if self.vitorias_jogador == 2:
                     print(
                         f"\n🎉 {self._jogador.nome} ganhou a mão (+{self.valor_da_mao_atual} tento)!")
@@ -231,7 +222,6 @@ class Partida:
                     self._bot._pontuacao += self.valor_da_mao_atual
                     break
 
-            # 4. FINAL DA MÃO E PREPARAÇÃO DA PRÓXIMA
             self.rodadas = 0
             self.regras.trocaMaoJogadores()
 
